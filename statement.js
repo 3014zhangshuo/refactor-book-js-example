@@ -27,18 +27,24 @@ module.exports = function (invoice, plays) {
     return plays[aPerformance.playID]
   }
 
+  function volumeCreditsFor(aPerformance) {
+    let result = 0
+    result += Math.max(aPerformance.audience - 30, 0)
+    // add extra credit for every ten comedy attendees
+    if ("comedy" == playFor(aPerformance).type) {
+      result += Math.floor(aPerformance.audience / 5)
+    }
+
+    return result
+  }
+
   let totalAmount = 0
   let volumeCredits = 0
   let result = `Statement for ${invoice.customer}\n`
   const format = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format
 
   for (let perf of invoice.performances) {
-    // add volume credits
-    volumeCredits += Math.max(perf.audience - 30, 0)
-    // add extra credit for every ten comedy attendees
-    if ("comedy" == playFor(perf).type) {
-      volumeCredits += Math.floor(perf.audience / 5)
-    }
+    volumeCredits += volumeCreditsFor(perf)
 
     // print line for this order
     result += `  ${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience} seats)\n`
