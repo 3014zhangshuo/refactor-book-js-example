@@ -1,12 +1,6 @@
 module.exports = function (invoice, plays) {
-  let totalAmount = 0
-  let volumeCredits = 0
-  let result = `Statement for ${invoice.customer}\n`
-  const format = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format
-
-  for (let perf of invoice.performances) {
-    const play = plays[perf.playID]
-    var thisAmount = 0
+  function amountFor (perf, play) {
+    let thisAmount = 0
 
     switch (play.type) {
     case "tragedy":
@@ -26,6 +20,18 @@ module.exports = function (invoice, plays) {
       throw new Error(`uknown type: ${play.type}`)
     }
 
+    return thisAmount
+  }
+
+  let totalAmount = 0
+  let volumeCredits = 0
+  let result = `Statement for ${invoice.customer}\n`
+  const format = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format
+
+  for (let perf of invoice.performances) {
+    const play = plays[perf.playID]
+    let thisAmount = amountFor(perf, play)
+
     // add volume credits
     volumeCredits += Math.max(perf.audience - 30, 0)
     // add extra credit for every ten comedy attendees
@@ -37,7 +43,7 @@ module.exports = function (invoice, plays) {
     result += `  ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`
   }
 
-  result += `Amount owed is ${format(thisAmount / 100)}\n`
+  result += `Amount owed is ${format(totalAmount / 100)}\n`
   result += `You earned ${volumeCredits} credits\n`
   return result
 }
