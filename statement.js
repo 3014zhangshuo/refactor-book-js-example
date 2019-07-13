@@ -1,4 +1,8 @@
 module.exports = function (invoice, plays) {
+  return renderPlainText(invoice, plays)
+}
+
+function renderPlainText(invoice, plays) {
   let result = `Statement for ${invoice.customer}\n`
 
   for (let perf of invoice.performances) {
@@ -9,7 +13,7 @@ module.exports = function (invoice, plays) {
   result += `Amount owed is ${usd(totalAmount())}\n`
   result += `You earned ${totalVolumeCredits()} credits\n`
   return result
-  
+
   function amountFor (aPerformance) {
     let result = 0
 
