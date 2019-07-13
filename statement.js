@@ -1,4 +1,15 @@
 module.exports = function (invoice, plays) {
+  let result = `Statement for ${invoice.customer}\n`
+
+  for (let perf of invoice.performances) {
+    // print line for this order
+    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`
+  }
+
+  result += `Amount owed is ${usd(totalAmount())}\n`
+  result += `You earned ${totalVolumeCredits()} credits\n`
+  return result
+  
   function amountFor (aPerformance) {
     let result = 0
 
@@ -43,19 +54,19 @@ module.exports = function (invoice, plays) {
       { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(aNumber / 100)
   }
 
-  let totalAmount = 0
-  let volumeCredits = 0
-  let result = `Statement for ${invoice.customer}\n`
-
-  for (let perf of invoice.performances) {
-    volumeCredits += volumeCreditsFor(perf)
-
-    // print line for this order
-    result += `  ${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience} seats)\n`
-    totalAmount += amountFor(perf)
+  function totalVolumeCredits() {
+    let result = 0
+    for (let perf of invoice.performances) {
+      result += volumeCreditsFor(perf)
+    }
+    return result
   }
 
-  result += `Amount owed is ${usd(totalAmount)}\n`
-  result += `You earned ${volumeCredits} credits\n`
-  return result
+  function totalAmount() {
+    let result = 0
+    for (let perf of invoice.performances) {
+      result += amountFor(perf)
+    }
+    return result
+  }
 }
