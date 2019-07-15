@@ -38,6 +38,17 @@ class ComedyCalculator extends PerformanceCalculator {
   }
 }
 
+function createPerformanceCalculator(aPerformance, aPlay) {
+  switch(aPlay.type) {
+  case "tragedy":
+    return new TragedyCalculator(aPerformance, aPlay)
+  case "comedy":
+    return new ComedyCalculator(aPerformance, aPlay)
+  default:
+    throw new Error(`uknown type: ${aPlay.type}`)
+  }
+}
+
 module.exports = function(invoice, plays) {
   const result = {}
   result.customer = invoice.customer
@@ -54,17 +65,6 @@ module.exports = function(invoice, plays) {
     result.amount  = calculator.amount
     result.volumeCredits = calculator.volumeCredits
     return result
-  }
-
-  function createPerformanceCalculator(aPerformance, aPlay) {
-    switch(aPlay.type) {
-    case "tragedy":
-      return new TragedyCalculator(aPerformance, aPlay)
-    case "comedy":
-      return new ComedyCalculator(aPerformance, aPlay)
-    default:
-      throw new Error(`uknown type: ${aPlay.type}`)
-    }
   }
   
   function playFor(aPerformance) {
